@@ -1,0 +1,118 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.timeline {
+  position: relative;
+  height: 400px;
+  overflow-x: auto;
+  background: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-header {
+  display: flex;
+  height: 50px;
+  background: white;
+  border-bottom: 2px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.hour-mark {
+  width: 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  border-right: 1px solid #f1f5f9;
+}
+
+.hour-mark:nth-child(odd) {
+  background: #f8fafc;
+}
+
+.timeline-body {
+  position: relative;
+  height: 350px;
+  /* MOBILE DRAG FIXES */
+  touch-action: none !important;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.event {
+  position: absolute;
+  top: 10px;
+  height: 80%;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 8px;
+  cursor: grab;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.1s ease;
+  
+  /* MOBILE PRODUCTION FIXES */
+  touch-action: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+}
+
+.event:active {
+  cursor: grabbing;
+  transform: scale(1.02);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .timeline {
+    height: 500px;
+  }
+  
+  .hour-mark {
+    font-size: 10px;
+  }
+  
+  .event {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+}
+
+/* HOUR HIGHLIGHTS */
+.hour-mark:nth-child(6n+1):before { /* 6,12,18,24 */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: rgba(59, 130, 246, 0.1);
+}
