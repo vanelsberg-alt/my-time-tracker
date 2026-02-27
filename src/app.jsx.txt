@@ -254,9 +254,9 @@ export default function App() {
   const timelineRef = useRef(null);
 
   const [rulers, setRulers] = useState([
-    { left: 20, width: 30, name: "Sleep" },
-    { left: 5, width: 12, name: "Read" },
-    { left: 70, width: 15, name: "Exercise" },
+    { left: 5, width: 25, name: "Sleep" },
+    { left: 35, width: 20, name: "Read" },
+    { left: 60, width: 20, name: "Exercise" },
   ]);
 
   const [nextColorIdx, setNextColorIdx] = useState(rulers.length % PALETTE.length);
@@ -305,6 +305,26 @@ export default function App() {
     document.addEventListener("mouseup", up);
   }, []);
 
+  const onTimelineTouch = useCallback((e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const startX = touch.clientX;
+    const startView = viewStartRef.current;
+    function move(ev) {
+      if (!timelineRef.current) return;
+      const t = ev.touches[0];
+      const rect = timelineRef.current.getBoundingClientRect();
+      setViewStart(mod(startView - ((t.clientX - startX) / rect.width) * VISIBLE_HOURS, TOTAL_HOURS));
+    }
+    function up() {
+      setViewStart(v => mod(Math.round(v * 2) / 2, TOTAL_HOURS));
+      document.removeEventListener("touchmove", move);
+      document.removeEventListener("touchend", up);
+    }
+    document.addEventListener("touchmove", move, { passive: false });
+    document.addEventListener("touchend", up);
+  }, []);
+
   const rulerDisplays = rulers.map(r => ({
     startH: decimalToDisplay(pctToTime(r.left, viewStart)),
     endH: decimalToDisplay(pctToTime(r.left + r.width, viewStart)),
@@ -328,7 +348,7 @@ export default function App() {
 
   return (
     <div style={{
-      width: "100vw", height: "100vh", display: "flex", alignItems: "center",
+      width: "100vw", minHeight: "100vh", display: "flex", alignItems: "center",
       justifyContent: "center", backgroundColor: "#f8fafc", padding: "16px",
       fontFamily: "'DM Sans', 'Segoe UI', system-ui, sans-serif"
     }}>
@@ -337,10 +357,13 @@ export default function App() {
         * { box-sizing: border-box; }
         input { font-family: inherit; }
         button:hover { filter: brightness(1.1); }
+        @media (max-width: 600px) {
+          .header-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
       `}</style>
       <div style={{ width: "100%", maxWidth: "860px" }}>
         {/* Header */}
-        <div style={{ marginBottom: "24px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+        <div className="header-row" style={{ marginBottom: "24px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
           <div>
             <h1 style={{
               fontSize: "22px", fontWeight: 700, margin: 0, letterSpacing: "-0.5px",
@@ -399,9 +422,11 @@ export default function App() {
                 style={{
                   position: "relative", overflow: "hidden", userSelect: "none",
                   height: "44px", backgroundColor: "#f8fafc",
-                  borderTop: "1px solid #f1f5f9", margin: "0 -12px", cursor: "grab"
+                  borderTop: "1px solid #f1f5f9", margin: "0 -12px", cursor: "grab",
+                  touchAction: "none"
                 }}
                 onMouseDown={onTimelineDown}
+                onTouchStart={onTimelineTouch}
               >
                 <div style={{
                   position: "absolute", top: "4px", right: "12px",
